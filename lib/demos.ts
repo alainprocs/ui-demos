@@ -19,4 +19,14 @@ export const demos: Demo[] = [
     accent: "#06b6d4",
     category: "SaaS",
   },
+  {
+    slug: "orbita",
+    name: "Orbita",
+    tagline: "Infrastructure Cost Intelligence",
+    description:
+      "AI-powered cloud cost optimization that eliminates waste automatically. Zero config, instant savings.",
+    date: "2026-04-12",
+    accent: "#f59e0b",
+    category: "SaaS",
+  },
 ];
