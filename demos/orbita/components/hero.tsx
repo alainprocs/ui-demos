@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useSpring, AnimatePresence } from "framer-motion";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const AMBER = "#f59e0b";
 const SCRAMBLE_CHARS = "!@#$%^&*ABCDEFabcdef0123456789";
@@ -323,6 +324,7 @@ function CostCurve() {
 // ── Savings ticker ──────────────────────────────────────────────
 function SavingsTicker() {
   const [val, setVal] = useState(12847293);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -337,14 +339,15 @@ function SavingsTicker() {
     <div
       style={{
         fontFamily: "'Courier New', monospace",
-        fontSize: "0.85rem",
+        fontSize: isMobile ? "0.72rem" : "0.85rem",
         color: "#4ade80",
         background: "rgba(74,222,128,0.06)",
         border: "1px solid rgba(74,222,128,0.2)",
-        padding: "10px 18px",
-        display: "inline-flex",
+        padding: isMobile ? "10px 12px" : "10px 18px",
+        display: "flex",
+        flexWrap: isMobile ? "wrap" : "nowrap",
         alignItems: "center",
-        gap: 8,
+        gap: 6,
         letterSpacing: "0.04em",
       }}
     >
@@ -425,6 +428,7 @@ function MagneticButton({
 export default function Hero() {
   const line1 = useScramble("Stop paying for idle cloud.");
   const line2 = useScramble("Start paying for results.", 2400);
+  const isMobile = useIsMobile();
 
   return (
     <section
@@ -462,7 +466,7 @@ export default function Hero() {
           zIndex: 2,
           maxWidth: 1200,
           margin: "0 auto",
-          padding: "80px 24px 60px",
+          padding: isMobile ? "60px 20px 48px" : "80px 24px 60px",
           width: "100%",
         }}
       >
@@ -503,7 +507,7 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
             style={{
-              fontSize: "clamp(2.8rem, 6vw, 5.5rem)",
+              fontSize: "clamp(2rem, 6vw, 5.5rem)",
               fontWeight: 900,
               lineHeight: 1.05,
               letterSpacing: "-0.03em",
@@ -519,7 +523,7 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.15 }}
             style={{
-              fontSize: "clamp(2.8rem, 6vw, 5.5rem)",
+              fontSize: "clamp(2rem, 6vw, 5.5rem)",
               fontWeight: 900,
               lineHeight: 1.05,
               letterSpacing: "-0.03em",
@@ -538,7 +542,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           style={{
-            fontSize: "1.1rem",
+            fontSize: isMobile ? "0.95rem" : "1.1rem",
             color: "rgba(255,255,255,0.55)",
             maxWidth: 560,
             lineHeight: 1.65,
@@ -557,7 +561,13 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.65 }}
-          style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 32 }}
+          style={{
+            display: "flex",
+            gap: 12,
+            flexWrap: "wrap",
+            marginBottom: 32,
+            flexDirection: isMobile ? "column" : "row",
+          }}
         >
           <MagneticButton filled>Start saving now</MagneticButton>
           <MagneticButton>See how it works</MagneticButton>
@@ -590,8 +600,8 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 1.0 }}
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 2,
+            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
+            gap: isMobile ? 16 : 2,
             maxWidth: 720,
             borderTop: "1px solid rgba(245,158,11,0.15)",
             paddingTop: 32,

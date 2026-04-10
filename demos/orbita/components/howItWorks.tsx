@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const AMBER = "#f59e0b";
 
@@ -60,6 +61,7 @@ const steps = [
 export default function HowItWorks() {
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const isMobile = useIsMobile();
 
   return (
     <section
@@ -68,7 +70,7 @@ export default function HowItWorks() {
         background: "#050508",
         borderTop: "1px solid rgba(245,158,11,0.1)",
         borderBottom: "1px solid rgba(245,158,11,0.1)",
-        padding: "120px 24px",
+        padding: isMobile ? "72px 20px" : "120px 24px",
       }}
     >
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -90,11 +92,11 @@ export default function HowItWorks() {
         </motion.div>
 
         {/* Section title */}
-        <div style={{ marginBottom: 80 }}>
+        <div style={{ marginBottom: isMobile ? 48 : 80 }}>
           <StaggerTitle
             text="Three steps to zero waste."
             style={{
-              fontSize: "clamp(2rem, 4vw, 3.5rem)",
+              fontSize: "clamp(1.8rem, 4vw, 3.5rem)",
               fontWeight: 900,
               letterSpacing: "-0.03em",
               color: "#fff",
@@ -106,22 +108,24 @@ export default function HowItWorks() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 0,
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+            gap: isMobile ? 40 : 0,
             position: "relative",
           }}
         >
-          {/* Connector line */}
-          <div
-            style={{
-              position: "absolute",
-              top: 28,
-              left: "16.67%",
-              right: "16.67%",
-              height: 1,
-              background: `linear-gradient(90deg, ${AMBER}60, ${AMBER}20, ${AMBER}60)`,
-            }}
-          />
+          {/* Connector line — desktop only */}
+          {!isMobile && (
+            <div
+              style={{
+                position: "absolute",
+                top: 28,
+                left: "16.67%",
+                right: "16.67%",
+                height: 1,
+                background: `linear-gradient(90deg, ${AMBER}60, ${AMBER}20, ${AMBER}60)`,
+              }}
+            />
+          )}
 
           {steps.map((step, i) => (
             <motion.div
@@ -130,8 +134,12 @@ export default function HowItWorks() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: i * 0.18, ease: [0.22, 1, 0.36, 1] }}
               style={{
-                padding: "0 32px 0 0",
+                padding: isMobile ? "0" : "0 32px 0 0",
                 position: "relative",
+                display: "flex",
+                flexDirection: isMobile ? "row" : "column",
+                gap: isMobile ? 20 : 0,
+                alignItems: isMobile ? "flex-start" : "stretch",
               }}
             >
               {/* Number bubble */}
@@ -148,53 +156,56 @@ export default function HowItWorks() {
                   fontSize: "1rem",
                   color: AMBER,
                   background: "#050508",
-                  marginBottom: 28,
+                  marginBottom: isMobile ? 0 : 28,
                   position: "relative",
                   zIndex: 1,
                   letterSpacing: "0.06em",
+                  flexShrink: 0,
                 }}
               >
                 {step.num}
               </div>
 
-              <div
-                style={{
-                  fontSize: "1.6rem",
-                  fontWeight: 900,
-                  color: "#fff",
-                  letterSpacing: "-0.02em",
-                  marginBottom: 12,
-                }}
-              >
-                {step.title}
-              </div>
+              <div style={{ flex: 1 }}>
+                <div
+                  style={{
+                    fontSize: "1.6rem",
+                    fontWeight: 900,
+                    color: "#fff",
+                    letterSpacing: "-0.02em",
+                    marginBottom: 12,
+                  }}
+                >
+                  {step.title}
+                </div>
 
-              <p
-                style={{
-                  fontSize: "0.95rem",
-                  color: "rgba(255,255,255,0.5)",
-                  lineHeight: 1.65,
-                  marginBottom: 16,
-                }}
-              >
-                {step.desc}
-              </p>
+                <p
+                  style={{
+                    fontSize: "0.95rem",
+                    color: "rgba(255,255,255,0.5)",
+                    lineHeight: 1.65,
+                    marginBottom: 16,
+                  }}
+                >
+                  {step.desc}
+                </p>
 
-              <div
-                style={{
-                  fontSize: "0.7rem",
-                  color: AMBER,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  fontFamily: "monospace",
-                  fontWeight: 600,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <span style={{ color: "rgba(255,255,255,0.3)" }}>›</span>
-                {step.detail}
+                <div
+                  style={{
+                    fontSize: "0.7rem",
+                    color: AMBER,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    fontFamily: "monospace",
+                    fontWeight: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  <span style={{ color: "rgba(255,255,255,0.3)" }}>›</span>
+                  {step.detail}
+                </div>
               </div>
             </motion.div>
           ))}

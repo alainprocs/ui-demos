@@ -2,6 +2,7 @@
 
 import { useRef, useCallback } from "react";
 import { motion, useInView, useSpring } from "framer-motion";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const AMBER = "#f59e0b";
 
@@ -65,13 +66,14 @@ function MagneticButton({
 export default function CTA() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const isMobile = useIsMobile();
 
   return (
     <section
       ref={ref}
       style={{
         background: AMBER,
-        padding: "120px 24px",
+        padding: isMobile ? "80px 20px" : "120px 24px",
         position: "relative",
         overflow: "hidden",
       }}
@@ -177,7 +179,8 @@ export default function CTA() {
           transition={{ duration: 0.5, delay: 0.35 }}
           style={{
             display: "flex",
-            gap: 0,
+            flexDirection: isMobile ? "column" : "row",
+            gap: isMobile ? 12 : 0,
             maxWidth: 520,
           }}
         >
@@ -193,6 +196,8 @@ export default function CTA() {
               fontSize: "0.9rem",
               outline: "none",
               fontFamily: "inherit",
+              width: isMobile ? "100%" : "auto",
+              boxSizing: "border-box",
             }}
           />
           <MagneticButton>Start saving</MagneticButton>

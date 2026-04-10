@@ -12,6 +12,7 @@ import {
   RotateCcw,
   Shield,
 } from "lucide-react";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const AMBER = "#f59e0b";
 
@@ -61,8 +62,10 @@ const features = [
 // ── 3D Tilt card ────────────────────────────────────────────────
 function FeatureCard({
   feat,
+  mobile,
 }: {
   feat: (typeof features)[0];
+  mobile?: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -92,11 +95,11 @@ function FeatureCard({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
-        width: 280,
+        width: mobile ? "100%" : 280,
         flexShrink: 0,
         background: "rgba(255,255,255,0.02)",
         border: "1px solid rgba(245,158,11,0.12)",
-        padding: "28px 24px",
+        padding: mobile ? "22px 18px" : "28px 24px",
         transition: "transform 0.12s ease, box-shadow 0.2s",
         cursor: "default",
         transformStyle: "preserve-3d",
@@ -154,15 +157,14 @@ function FeatureCard({
   );
 }
 
-// ── Section ──────────────────────────────────────────────────────
-export default function Features() {
+// ── Desktop: horizontal scroll tape ─────────────────────────────
+function DesktopFeatures() {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
 
-  // Translate the tape: moves left as we scroll through
   const x = useTransform(scrollYProgress, [0.1, 0.9], ["0%", "-45%"]);
 
   return (
@@ -173,11 +175,9 @@ export default function Features() {
         padding: "120px 0",
         overflow: "hidden",
         position: "relative",
-        // Give height so the scroll range is meaningful
         minHeight: "160vh",
       }}
     >
-      {/* Sticky label + strip container */}
       <div
         style={{
           position: "sticky",
@@ -185,7 +185,6 @@ export default function Features() {
           paddingLeft: 24,
         }}
       >
-        {/* Label */}
         <div
           style={{
             fontSize: "0.7rem",
@@ -210,7 +209,6 @@ export default function Features() {
           The complete FinOps platform.
         </div>
 
-        {/* Horizontal tape */}
         <div style={{ overflow: "hidden" }}>
           <motion.div
             style={{
@@ -227,7 +225,6 @@ export default function Features() {
           </motion.div>
         </div>
 
-        {/* Fade edges */}
         <div
           style={{
             position: "absolute",
@@ -235,12 +232,73 @@ export default function Features() {
             top: 0,
             bottom: 0,
             width: 120,
-            background:
-              "linear-gradient(to left, #050508, transparent)",
+            background: "linear-gradient(to left, #050508, transparent)",
             pointerEvents: "none",
           }}
         />
       </div>
     </section>
   );
+}
+
+// ── Mobile: 2-column grid ────────────────────────────────────────
+function MobileFeatures() {
+  return (
+    <section
+      style={{
+        background: "#050508",
+        padding: "72px 20px",
+      }}
+    >
+      <div
+        style={{
+          fontSize: "0.7rem",
+          color: AMBER,
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          fontWeight: 700,
+          marginBottom: 12,
+        }}
+      >
+        Everything You Need
+      </div>
+      <div
+        style={{
+          fontSize: "clamp(1.5rem, 6vw, 2.5rem)",
+          fontWeight: 900,
+          color: "#fff",
+          letterSpacing: "-0.03em",
+          marginBottom: 32,
+        }}
+      >
+        The complete FinOps platform.
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: 12,
+        }}
+      >
+        {features.map((feat, i) => (
+          <motion.div
+            key={feat.title}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.4, delay: (i % 2) * 0.08 }}
+          >
+            <FeatureCard feat={feat} mobile />
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── Section ──────────────────────────────────────────────────────
+export default function Features() {
+  const isMobile = useIsMobile();
+  return isMobile ? <MobileFeatures /> : <DesktopFeatures />;
 }

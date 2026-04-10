@@ -3,6 +3,7 @@
 import { useRef, useCallback } from "react";
 import { motion, useInView, useSpring } from "framer-motion";
 import { Check } from "lucide-react";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const AMBER = "#f59e0b";
 
@@ -124,13 +125,14 @@ function MagneticButton({
 export default function Pricing() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const isMobile = useIsMobile();
 
   return (
     <section
       ref={ref}
       style={{
         background: "#050508",
-        padding: "120px 24px",
+        padding: isMobile ? "72px 20px" : "120px 24px",
         borderTop: "1px solid rgba(245,158,11,0.08)",
       }}
     >
@@ -175,7 +177,7 @@ export default function Pricing() {
           style={{
             textAlign: "center",
             color: "rgba(255,255,255,0.45)",
-            marginBottom: 64,
+            marginBottom: isMobile ? 40 : 64,
             fontSize: "1rem",
           }}
         >
@@ -185,9 +187,9 @@ export default function Pricing() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 1,
-            background: "rgba(255,255,255,0.04)",
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+            gap: isMobile ? 16 : 1,
+            background: isMobile ? "transparent" : "rgba(255,255,255,0.04)",
           }}
         >
           {plans.map((plan, i) => (
@@ -198,8 +200,8 @@ export default function Pricing() {
               transition={{ duration: 0.6, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
               style={{
                 background: plan.highlight ? `rgba(245,158,11,0.06)` : "#050508",
-                border: plan.highlight ? `1px solid ${AMBER}44` : "none",
-                padding: "40px 32px",
+                border: plan.highlight ? `1px solid ${AMBER}44` : isMobile ? "1px solid rgba(255,255,255,0.06)" : "none",
+                padding: isMobile ? "32px 24px" : "40px 32px",
                 position: "relative",
               }}
             >

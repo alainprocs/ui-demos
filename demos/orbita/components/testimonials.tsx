@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const AMBER = "#f59e0b";
 
@@ -129,13 +130,14 @@ function TestimonialCard({
 export default function Testimonials() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true });
+  const isMobile = useIsMobile();
 
   return (
     <section
       ref={ref}
       style={{
         background: "#050508",
-        padding: "120px 24px",
+        padding: isMobile ? "72px 20px" : "120px 24px",
       }}
     >
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -164,7 +166,7 @@ export default function Testimonials() {
             fontWeight: 900,
             color: "#fff",
             letterSpacing: "-0.03em",
-            marginBottom: 56,
+            marginBottom: isMobile ? 32 : 56,
           }}
         >
           Trusted by the teams building tomorrow.
@@ -173,8 +175,8 @@ export default function Testimonials() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 16,
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+            gap: isMobile ? 16 : 16,
           }}
         >
           {testimonials.map((t, i) => (

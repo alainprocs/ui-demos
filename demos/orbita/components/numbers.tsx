@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const AMBER = "#f59e0b";
 
@@ -52,7 +53,7 @@ function BigCounter({
       >
         <div
           style={{
-            fontSize: "clamp(3.5rem, 8vw, 7rem)",
+            fontSize: "clamp(3rem, 8vw, 7rem)",
             fontWeight: 900,
             color: "#fff",
             fontFamily: "'Courier New', monospace",
@@ -84,6 +85,14 @@ function BigCounter({
 export default function Numbers() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true });
+  const isMobile = useIsMobile();
+
+  const items = [
+    { to: 47, prefix: "$", suffix: "M+", label: "Cloud spend optimized" },
+    { to: 2400, suffix: "+", label: "Engineering teams" },
+    { to: 73, suffix: "%", label: "Average cost reduction" },
+    { to: 4.9, suffix: "/5", label: "Customer satisfaction" },
+  ];
 
   return (
     <section
@@ -131,16 +140,11 @@ export default function Numbers() {
           maxWidth: 1200,
           margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
           borderLeft: "1px solid rgba(255,255,255,0.04)",
         }}
       >
-        {[
-          { to: 47, prefix: "$", suffix: "M+", label: "Cloud spend optimized" },
-          { to: 2400, suffix: "+", label: "Engineering teams" },
-          { to: 73, suffix: "%", label: "Average cost reduction" },
-          { to: 4.9, suffix: "/5", label: "Customer satisfaction" },
-        ].map((item, i) => (
+        {items.map((item, i) => (
           <div
             key={item.label}
             style={{
