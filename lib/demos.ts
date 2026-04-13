@@ -29,4 +29,14 @@ export const demos: Demo[] = [
     accent: "#f59e0b",
     category: "SaaS",
   },
+  {
+    slug: "luminary",
+    name: "Luminary",
+    tagline: "The Creative OS for Design Teams",
+    description:
+      "Luminary unifies AI design generation, real-time collaboration, and version control into one fluid workspace. Ship beautiful work, faster.",
+    date: "2026-04-13",
+    accent: "#ff4d6d",
+    category: "SaaS",
+  },
 ];
