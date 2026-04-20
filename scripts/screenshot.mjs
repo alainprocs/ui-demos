@@ -15,7 +15,7 @@ const context = await browser.newContext({
 const page = await context.newPage();
 
 async function tryScreenshot(demo, attempt = 1) {
-  const url = `https://alainprocs.github.io/ui-demos/${demo.slug}/`;
+  const url = `https://alainprocs.github.io/ui-demos/${demo.slug}`;
   const dest = `/tmp/screenshots/${demo.slug}.jpg`;
 
   try {
