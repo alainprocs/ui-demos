@@ -47,7 +47,6 @@ jobs:
   screenshot:
     needs: deploy
     runs-on: ubuntu-latest
-    if: ${{ secrets.DISPATCH_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -66,36 +65,7 @@ jobs:
         run: sleep 45
 
       - name: Take screenshots
-        run: |
-          cat > /tmp/screenshot.mjs << 'SCRIPT'
-          import { chromium } from 'playwright';
-          import { readFileSync } from 'fs';
-
-          const demos = JSON.parse(readFileSync('public/demos.json', 'utf8'));
-          const browser = await chromium.launch();
-          const page = await browser.newPage();
-          await page.setViewportSize({ width: 1280, height: 800 });
-
-          for (const demo of demos) {
-            const url = `https://alainprocs.github.io/ui-demos/${demo.slug}/`;
-            try {
-              await page.goto(url, { waitUntil: 'networkidle', timeout: 40000 });
-              await page.waitForTimeout(2500); // let animations settle
-              await page.screenshot({
-                path: `/tmp/${demo.slug}.jpg`,
-                type: 'jpeg',
-                quality: 92,
-                clip: { x: 0, y: 0, width: 1280, height: 800 },
-              });
-              console.log(`✓ ${demo.slug}`);
-            } catch (e) {
-              console.error(`✗ ${demo.slug}: ${e.message}`);
-            }
-          }
-
-          await browser.close();
-          SCRIPT
-          node /tmp/screenshot.mjs
+        run: node scripts/screenshot.mjs
 
       - name: Push screenshots to portfolio repo
         env:
@@ -111,7 +81,7 @@ jobs:
           mkdir -p public/assets/images
 
           CHANGED=0
-          for f in /tmp/*.jpg; do
+          for f in /tmp/screenshots/*.jpg; do
             [ -f "$f" ] || continue
             slug=$(basename "$f" .jpg)
             dest="public/assets/images/${slug}.jpg"
@@ -125,24 +95,21 @@ jobs:
           elif git diff --staged --quiet; then
             echo "Screenshots unchanged — no commit needed"
           else
-            git commit -m "chore: update demo screenshots [skip ci]"
-            # Remove [skip ci] on push so portfolio rebuild triggers
-            git commit --amend --no-edit -m "chore: update demo screenshots"
+            git commit -m "chore: update demo screenshots"
             git push
           fi
 
   trigger-portfolio:
     needs: screenshot
     runs-on: ubuntu-latest
-    # Belt-and-suspenders: if the screenshot push didn't trigger a rebuild
-    # (e.g. images unchanged), this dispatch guarantees portfolio rebuilds.
-    if: ${{ secrets.DISPATCH_TOKEN != '' }}
     steps:
       - name: Trigger portfolio rebuild
+        env:
+          GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
         run: |
           curl -s -X POST \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.DISPATCH_TOKEN }}" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/alainprocs/portfolio/actions/workflows/deploy.yml/dispatches \
             -d '{"ref":"main"}'
