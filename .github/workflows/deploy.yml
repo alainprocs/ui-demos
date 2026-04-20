@@ -68,6 +68,7 @@ jobs:
         run: node scripts/screenshot.mjs
 
       - name: Push screenshots to portfolio repo
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
         run: |
