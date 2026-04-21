@@ -1,0 +1,69 @@
+name: Build New UI Demo (Scheduled)
+
+on:
+  schedule:
+    # Every 3 days at 10:17 UTC
+    - cron: "17 10 */3 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.DISPATCH_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Configure git identity
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Build new demo
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+        run: |
+          EXISTING=$(node -e "const d=require('./public/demos.json'); console.log(d.map(x=>x.slug).join(', '))")
+          echo "Existing demos: $EXISTING"
+
+          claude --dangerously-skip-permissions -p "
+          You are building a new UI demo in the current working directory.
+          Read CLAUDE.md first — it defines all quality standards.
+
+          Existing slugs (do NOT use these): $EXISTING
+
+          Choose a fresh SaaS concept with a distinct accent color from a rich category:
+          fintech, cybersecurity, AI devtools, design tools, logistics, healthtech, legal tech, climate tech, edtech, gaming infrastructure, or similar.
+
+          Follow all rules in CLAUDE.md exactly. Key requirements:
+          - 6+ simultaneous CSS keyframe animations in the hero
+          - Visual quality must exceed Orbita (look at demos/orbita/ for reference)
+          - Gradient mesh background, glowing CTAs, animated borders, depth layers
+          - Sharp specific copywriting — real numbers, action headlines, real-sounding testimonials
+          - Pure server components ONLY: no 'use client', no framer-motion, no next/link
+          - Use plain <a> tags, <style> tags for keyframes, lucide-react for icons
+          - Run: npm run build — fix every error before committing
+
+          After build passes clean:
+          1. Append the new demo entry to public/demos.json
+          2. Clone the portfolio repo into /tmp/portfolio-repo using the GH_TOKEN env var:
+             git clone https://x-access-token:\$GH_TOKEN@github.com/alainprocs/portfolio.git /tmp/portfolio-repo
+             Then append the same entry to /tmp/portfolio-repo/lib/demos-data.json
+             Then commit and push /tmp/portfolio-repo
+          3. Stage all new demo files + public/demos.json and commit to this repo, then push to origin main
+          "
